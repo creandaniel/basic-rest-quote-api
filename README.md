@@ -10,8 +10,7 @@ basicrestapi
 
 # PHP 7.2 (not tested on earlier)
 #Route and Method Bundles
-
-# HttpFoundation (it uses request and response namespacing)
+Composer (need to ensure to run composer:require and composer:update, in order to use symfony libraries.
 
 # How to use
 
