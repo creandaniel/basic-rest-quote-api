@@ -3,12 +3,15 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\QuoteAPI;
-
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Symfony\Component\Validator\Constraints\DateTime;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Doctrine\ORM\Tools\Pagination\Paginator;
+
 
 
 
@@ -22,13 +25,28 @@ class QuoteControllerController extends Controller
 
     	$sourceQuery = $request->query->get('source');
         $quoteQuery = $request->query->get('quote');
+        $genreQuery = $request->query->get('genre');
+        $countryOrigin = $request->query->get('country_origin');
+        $authorProfession = $request->query->get('author_profession');
 
-		        // Create a new empty object
+
+		// Create a new empty object
 		$quote = new QuoteAPI();
 
 		// Use methods from the Quote entity to set the values
 		$quote->setSource($sourceQuery);
 		$quote->setQuote($quoteQuery);
+        $quote->setGenre($genreQuery);
+        $quote->setCountryOrigin($countryOrigin);
+        $quote->setAuthorProfession($authorProfession);
+
+        $created_at_date = new \DateTime();
+
+
+        $quote->setCreatedAt($created_at_date);
+        $quote->setUpdatedAt($created_at_date);
+
+       
 
 	    // Get the Doctrine service and manager
 	    $em = $this->getDoctrine()->getManager();
@@ -39,7 +57,16 @@ class QuoteControllerController extends Controller
 	    // Save our quote
 	    $em->flush();
 
-    	return new Response('It\'s probably been saved', 201);
+    	return new Response($sourceQuery .' ' . 'has probably been saved', 201);
+    }
+
+
+    public function actionValidation()
+    {
+        
+
+
+        return;
     }
 
 
@@ -55,11 +82,80 @@ class QuoteControllerController extends Controller
     	->findOneBy(['id' => $id]);
 
     	$data =[
+            'id' => $id,
 	    	'quote' => $quote->getQuote(),
     		'source' => $quote->getSource(),
+            'author' => $quote->getAuthorProfession(),
+            'country_origin' => $quote->getCountryOrigin(),
+            'genre' => $quote->getGenre(),
     	];
 
-    	return new Response(json_encode($data));
+        return new JsonResponse($data);
+    }
+
+     /**
+     * @Route("/api/v1/allquotes{pageNo}")
+     * @Method("GET")
+     */
+    public function getAllAction($pageNo = 1)
+    {
+
+        // $data =[
+        //     // 'quote' => $quote->getQuote(),
+        //     // 'source' => $quote->getSource(),
+        // ];
+        
+
+        $repository = $this->getDoctrine()
+            ->getRepository('AppBundle:QuoteAPI');
+
+
+        if(isset($_GET['pageNo']))
+        {
+            $pageNo = $_GET['pageNo'];
+        }
+        else 
+        {
+            $pageNo = 1;
+        }
+
+
+        $pageSize = '5';
+
+        $query = $repository->createQueryBuilder('p')
+            ->orderBy('p.id', 'ASC')
+            ->setFirstResult(0)
+            ->setMaxResults($pageSize)
+            ->getQuery();
+
+
+        $paginator  = new \Doctrine\ORM\Tools\Pagination\Paginator($query);
+
+
+
+        // you can get total items
+        $totalItems = count($paginator);
+
+
+        // get total pages
+        $pagesCount = ceil($totalItems / $pageSize);
+
+        $paginator
+        ->getQuery()
+        ->setFirstResult($pageSize * ($pageNo-1)) // set the offset
+        ->setMaxResults($pageSize); // set the limit
+
+
+        $paginator = $query->getResult();
+
+        $productsResults = [
+            'results' => $paginator,
+            'pageNo' => $pageNo,
+            'totalQuotes' => $totalItems,
+            'totalPages' => $pagesCount 
+        ];
+
+        return new JsonResponse($productsResults);
     }
 
 
@@ -73,6 +169,9 @@ class QuoteControllerController extends Controller
 
     	$sourceQuery = $request->query->get('source');
         $quoteQuery = $request->query->get('quote');
+        $genreQuery = $request->query->get('genre');
+        $countryOrigin = $request->query->get('country_origin');
+        $authorProfession = $request->query->get('author_profession');
 
 
 		$quote = $this->getDoctrine()
@@ -81,8 +180,20 @@ class QuoteControllerController extends Controller
 
 
 		// Use methods from the Quote entity to set the values
-		$quote->setSource($sourceQuery);
-		$quote->setQuote($quoteQuery);
+		  // Create a new empty object
+        $quote = new QuoteAPI();
+
+        // Use methods from the Quote entity to set the values
+        $quote->setSource($sourceQuery);
+        $quote->setQuote($quoteQuery);
+        $quote->setGenre($genreQuery);
+        $quote->setCountryOrigin($countryOrigin);
+        $quote->setAuthorProfession($authorProfession);
+
+        $created_at_date = new \DateTime();
+
+        $quote->setCreatedAt($created_at_date);
+        $quote->setUpdatedAt($created_at_date);
 
 	    // Get the Doctrine service and manager
 	    $em = $this->getDoctrine()->getManager();
@@ -95,5 +206,6 @@ class QuoteControllerController extends Controller
 
     	return new Response('It\'s probably been saved', 201);
     }
+
 
 }
