@@ -37,7 +37,11 @@ http://127.0.0.1:8000/api/v1/allquotes?pageNo=2
 
 http://127.0.0.1:8000/api/v1/quote/1
 
+# How to install DATABASE
 
+1. Via commandline (in linux) use:
+php bin/console doctrine:database:create
+php bin/console doctrine:schema:createphp bin/console doctrine:schema:create
 
 
 
