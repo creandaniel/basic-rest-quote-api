@@ -16,11 +16,11 @@ basicrestapi
 # How to use
 
 # 1. Start server via commaond: php bin/console server:start
-# 2. 
+# 2. Use any of following URLs below:
 
 #2.1 Adding an quote
 
-#127.0.0.1:8000/api/v1/quote?quote=an injured friend is the bitterest of foes&source=thomas+jefferson
+http://127.0.0.1:8000/api/v1/quote?quote=an injured friend is the bitterest of foes&source=google&author=thomas+jefferson&author_profession=unknown&genre=focus&country_origin=UKKKK
 
 #2.2 Update a quote
 
@@ -31,11 +31,11 @@ basicrestapi
 
 #3.4 Get all quotes (via Pagination)
 
-#//TODO http://127.0.0.1:8000/api/v1/allquotes?pageNo=2
+http://127.0.0.1:8000/api/v1/allquotes?pageNo=2
 
 #3.5 get an quote 
 
-# http://127.0.0.1:8000/api/v1/quote/1
+http://127.0.0.1:8000/api/v1/quote/1
 
 
 
